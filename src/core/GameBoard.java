@@ -5,34 +5,29 @@ import java.util.ArrayList;
 import core.exception.InvalidArgumentEx;
 
 public class GameBoard {
-	private ArrayList<ArrayList<BoardTile>> board;
+	private int boardWidth;
+	private ArrayList<BoardTile> board;
 	
 	public GameBoard(int width, int height) throws InvalidArgumentEx {
+		boardWidth = width;
 		board = buildBoard(width, height);
 	}
 	
-	private ArrayList<ArrayList<BoardTile>> buildBoard(int width, int height) throws InvalidArgumentEx {
+	private ArrayList<BoardTile> buildBoard(int width, int height) throws InvalidArgumentEx {
 		if (height<1 || width<1) throw new InvalidArgumentEx("Invalid board size");
-		ArrayList<ArrayList<BoardTile>> res = new ArrayList<>();
+		ArrayList<BoardTile> res = new ArrayList<>();
 		
-		// First row
-		ArrayList<BoardTile> firstRow = new ArrayList<>();
-		firstRow.add(new BoardBlackholeTile(this));
-		for (int j=1; j<width; j++) {
-			firstRow.add(new BoardTile(this));
-		}
-		res.add(firstRow);
-		
-		// Other rows
-		for (int i=1; i<height; i++) {
-			ArrayList<BoardTile> newRow = new ArrayList<>();
-			for (int j=0; j<width; j++) {
-				newRow.add(new BoardTile(this));
-			}
-			res.add(newRow);
+		res.add(new BoardBlackholeTile(this,0,0));
+		for (int i=1; i<width*height; i++) {
+			int x = i/width;
+			res.add(new BoardTile(this,x,i-x*width));
 		}
 		
 		return res;
+	}
+	
+	public BoardTile getTile(int x, int y) {
+		return board.get(y*boardWidth+x);
 	}
 
 }
