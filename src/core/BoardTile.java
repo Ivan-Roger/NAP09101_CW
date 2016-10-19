@@ -1,8 +1,14 @@
 package core;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import core.exception.UnallowedEx;
+
 public class BoardTile {
 	private int xPos, yPos;
 	private GameBoard myBoard;
+	private ArrayList<Ship> ships;
 	
 	// Constructors
 	public BoardTile(GameBoard myBoard, int xPos, int yPos) {
@@ -34,6 +40,14 @@ public class BoardTile {
 
 	private void setY(int yPos) {
 		this.yPos = yPos;
+	}
+
+	public List<Ship> getShips() {
+		return ships;
+	}
+
+	public void addShip(Ship ship) throws UnallowedEx {
+		this.ships.add(ship);
 	}
 
 }
