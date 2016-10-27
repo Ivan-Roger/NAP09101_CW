@@ -21,8 +21,8 @@ public class GameBoard {
 		
 		res.add(new BoardBlackholeTile(this,0,0));
 		for (int i=1; i<width*height; i++) {
-			int x = i/width;
-			res.add(new BoardTile(this,x,i-x*width));
+			int y = i/width;
+			res.add(new BoardTile(this,i-y*width,y));
 		}
 		
 		return res;
