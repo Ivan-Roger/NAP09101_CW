@@ -6,6 +6,7 @@ import java.util.Random;
 
 import ui.UiWrapper;
 import core.actions.Action;
+import core.actions.ShipSpawnAction;
 import core.exception.GameEx;
 import core.exception.InvalidActionEx;
 import core.exception.InvalidArgumentEx;
@@ -13,6 +14,7 @@ import core.exception.NotInitializedEx;
 import core.exception.OutOfBoundsEx;
 import core.exception.UnallowedEx;
 import core.ships.MotherShip;
+import core.ships.StarFighterShip;
 
 public class GameWrapper {
 	
@@ -90,18 +92,20 @@ public class GameWrapper {
 		
 		Random alea = new Random();
 		if (alea.nextInt(3)!=0) {
-			
+			StarFighterShip ship = new StarFighterShip(this);
+			try {
+				addAction(new ShipSpawnAction(ship, board.getTile(0, 0)));
+			} catch (InvalidArgumentEx e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (OutOfBoundsEx e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		while(!actTodo.isEmpty()) {
-			Action act = actTodo.pollFirst();
-			try {
-				act.doAction(this);
-				actDone.addFirst(act);
-				updateInterfaces();
-			} catch (GameEx e) {
-				throw new InvalidActionEx(e);
-			}
+			performAction();
 		}
 	}
 
@@ -118,7 +122,7 @@ public class GameWrapper {
 				
 				BoardTile tile = board.getTile(x, y);
 				if (tile.getType()==BoardTileType.BLACKHOLE) throw new UnallowedEx("Invalid spawn position.");
-				board.spawnShip(getMotherShip(), tile);
+				board.spawnShip(motherShip, tile);
 				shipSpawned = true;
 			} catch (UnallowedEx e) {
 				// Ignore
@@ -127,6 +131,17 @@ public class GameWrapper {
 			} catch (InvalidArgumentEx e) {
 				System.err.println("[EXCEPT] Random spawn position was invalid.");
 			}
+		}
+	}
+	
+	private void performAction() throws InvalidActionEx {
+		Action act = actTodo.pollFirst();
+		try {
+			act.doAction(this);
+			actDone.addFirst(act);
+			updateInterfaces();
+		} catch (GameEx e) {
+			throw new InvalidActionEx(e);
 		}
 	}
 

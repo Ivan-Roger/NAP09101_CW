@@ -15,7 +15,9 @@ public class Main {
 		
 		try {
 			GameWrapper game = new GameWrapper();
+			@SuppressWarnings("unused")
 			TextUI textUi = new TextUI(game);
+			
 			game.startGame();
 			
 			for (int i=0; i<20; i++) {

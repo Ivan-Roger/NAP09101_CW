@@ -1,12 +1,8 @@
 package core.ships;
 
 import core.BoardTile;
-import core.Direction;
 import core.GameWrapper;
-import core.actions.ShipMoveAction;
-import core.exception.InvalidArgumentEx;
 import core.exception.NotInitializedEx;
-import core.exception.OutOfBoundsEx;
 
 public abstract class Ship {
 	protected GameWrapper game;
