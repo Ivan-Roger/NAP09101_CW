@@ -1,26 +1,29 @@
 package core;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+
+import core.ships.Ship;
 
 public class BoardTile {
 	private int xPos, yPos;
 	private GameBoard myBoard;
-	private ArrayList<Ship> ships;
+	private ArrayList<Ship> ships = new ArrayList<>();
 	
 	// Constructors
 	public BoardTile(GameBoard myBoard, int xPos, int yPos) {
-		setMyBoard(myBoard);
+		setBoard(myBoard);
 		setX(xPos);
 		setY(yPos);
 	}
 
 	// Getters and Setters
-	protected GameBoard getMyBoard() {
+	public GameBoard getBoard() {
 		return myBoard;
 	}
 
-	private void setMyBoard(GameBoard myBoard) {
+	private void setBoard(GameBoard myBoard) {
 		this.myBoard = myBoard;
 	}
 
@@ -46,6 +49,14 @@ public class BoardTile {
 
 	public void addShip(Ship ship) {
 		this.ships.add(ship);
+	}
+
+	public boolean removeShip(Ship ship) {
+		return this.ships.remove(ship);
+	}
+	
+	public Point toPoint() {
+		return new Point(this.xPos, this.yPos);
 	}
 
 }

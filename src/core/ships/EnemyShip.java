@@ -1,6 +1,4 @@
-package core;
-
-import core.ships.Ship;
+package core.ships;
 
 public abstract class EnemyShip extends Ship {
 
