@@ -1,9 +1,12 @@
 package main;
 
-import ui.text.TextWrapper;
+import core.Direction;
 import core.GameWrapper;
 import core.actions.ShipMoveAction;
+import core.exception.InvalidActionEx;
 import core.exception.InvalidArgumentEx;
+import core.exception.OutOfBoundsEx;
+import ui.TextUI;
 
 public class Main {
 
@@ -12,27 +15,33 @@ public class Main {
 		
 		try {
 			GameWrapper game = new GameWrapper();
-			TextWrapper textUi = new TextWrapper(game);
-			game.registerUi(textUi);			
+			TextUI textUi = new TextUI(game);
 			game.startGame();
 			
-			textUi.draw();
-			System.out.println("MotherShip: "+game.getMotherShip().getPosition().toPoint());
+			for (int i=0; i<20; i++) {
+				Direction direction = Direction.random();
+				System.out.println("Moving "+direction);
+				try {
+					game.addAction(new ShipMoveAction(game.getMotherShip(), direction));
+					game.tick();
+				} catch (OutOfBoundsEx e) {
+					System.err.println("Wrong move");
+				}
+			}
 			
-			game.addAction(new ShipMoveAction(1,3,game.getMotherShip()));
-			game.tick();
+			System.out.println("\n---------------------------------------------------------------------------\n");
 			
-			textUi.draw();
-			System.out.println("MotherShip: "+game.getMotherShip().getPosition().toPoint());
+			while (game.canUndo()) {
+				game.undo();
+			}
 			
-			game.undo();
-			
-			textUi.draw();
 			System.out.println("MotherShip: "+game.getMotherShip().getPosition().toPoint());
 			
 		} catch (InvalidArgumentEx e) {
 			System.err.println("Unable to create a Game instance !");
 			System.exit(-1);
+		} catch (InvalidActionEx e) {
+			System.err.println(e.getMessage());
 		}
 		
 		

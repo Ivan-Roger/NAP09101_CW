@@ -1,10 +1,20 @@
 package core.ships;
 
 import core.BoardTile;
-import core.exception.UnallowedEx;
+import core.Direction;
+import core.GameWrapper;
+import core.actions.ShipMoveAction;
+import core.exception.InvalidArgumentEx;
+import core.exception.NotInitializedEx;
+import core.exception.OutOfBoundsEx;
 
 public abstract class Ship {
-	private BoardTile position;
+	protected GameWrapper game;
+	protected BoardTile position;
+	
+	public Ship(GameWrapper game) {
+		this.game = game;
+	}
 	
 	public void setPosition(BoardTile pos) {
 		this.position = pos;
@@ -14,8 +24,6 @@ public abstract class Ship {
 		return position;
 	}
 
-	public void moveTo(int x, int y) throws UnallowedEx {
-		position.getBoard().moveShip(x,y,this);
-	}
+	public abstract void move() throws NotInitializedEx;
 
 }

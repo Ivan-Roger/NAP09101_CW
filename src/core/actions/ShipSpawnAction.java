@@ -1,34 +1,31 @@
 package core.actions;
 
-import java.awt.Point;
-
+import core.BoardTile;
+import core.GameWrapper;
 import core.exception.InvalidArgumentEx;
-import core.exception.UnallowedEx;
+import core.exception.OutOfBoundsEx;
 import core.ships.Ship;
 
 public class ShipSpawnAction extends Action {
 	private Ship ship;
-	private Point to;
+	private BoardTile pos;
 
-	public ShipSpawnAction(int x, int y, Ship ship) throws InvalidArgumentEx {
+	public ShipSpawnAction(Ship ship, BoardTile pos) throws InvalidArgumentEx {
 		this.ship = ship;
 		if (ship.getPosition()!=null) throw new InvalidArgumentEx("Ship has a position, use ShipMoveAction");
+		if (pos==null) throw new InvalidArgumentEx("Invalid position.");
 		
-		this.to = new Point(x,y);
+		this.pos = pos;
 	}
 	
 	@Override
-	public void doAction() {
-		try {
-			ship.moveTo((int) to.getX(), (int) to.getY());
-		} catch (UnallowedEx e) {
-			System.err.println("Can't perform action: "+e.getMessage()); // TODO: throw Exception
-		}
+	public void doAction(GameWrapper game) throws OutOfBoundsEx, InvalidArgumentEx {
+		game.getBoard().spawnShip(ship, pos);
 	}
 
 	@Override
-	public void undoAction() {
-		ship.getPosition().getBoard().removeShip(ship);
+	public void undoAction(GameWrapper game) {
+		game.getBoard().removeShip(ship);
 	}
 
 }

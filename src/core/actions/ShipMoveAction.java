@@ -1,43 +1,35 @@
 package core.actions;
 
-import java.awt.Point;
-
 import core.BoardTile;
+import core.Direction;
+import core.GameWrapper;
 import core.exception.InvalidArgumentEx;
-import core.exception.UnallowedEx;
+import core.exception.NotInitializedEx;
+import core.exception.OutOfBoundsEx;
 import core.ships.Ship;
 
 public class ShipMoveAction extends Action {
 	private Ship ship;
-	private Point from;
-	private Point to;
+	private BoardTile from;
+	private BoardTile to;
 
-	public ShipMoveAction(int x, int y, Ship ship) throws InvalidArgumentEx {
+	public ShipMoveAction(Ship ship, Direction direction) throws InvalidArgumentEx, OutOfBoundsEx {
 		this.ship = ship;
 		
 		BoardTile oldPos = ship.getPosition();
 		if (oldPos==null) throw new InvalidArgumentEx("Ship doesn't have a position, use ShipSpawnAction");
-		this.from = new Point(oldPos.getX(), oldPos.getY());
-		
-		this.to = new Point(x,y);
+		this.from = oldPos;
+		this.to = oldPos.getNeighbour(direction);
 	}
 	
 	@Override
-	public void doAction() {
-		try {
-			ship.moveTo((int) to.getX(), (int) to.getY());
-		} catch (UnallowedEx e) {
-			System.err.println("Can't perform action: "+e.getMessage()); // TODO: throw Exception
-		}
+	public void doAction(GameWrapper game) throws InvalidArgumentEx, NotInitializedEx {
+		game.getBoard().moveShip(ship, to);
 	}
 
 	@Override
-	public void undoAction() {
-		try {
-			ship.moveTo((int) from.getX(), (int) from.getY());
-		} catch (UnallowedEx e) {
-			System.err.println("Can't perform action: "+e.getMessage()); // TODO: throw Exception
-		}
+	public void undoAction(GameWrapper game) throws InvalidArgumentEx, NotInitializedEx {
+		game.getBoard().moveShip(ship, from);
 	}
 
 }

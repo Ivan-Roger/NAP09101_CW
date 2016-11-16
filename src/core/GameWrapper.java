@@ -6,7 +6,11 @@ import java.util.Random;
 
 import ui.UiWrapper;
 import core.actions.Action;
+import core.exception.GameEx;
+import core.exception.InvalidActionEx;
 import core.exception.InvalidArgumentEx;
+import core.exception.NotInitializedEx;
+import core.exception.OutOfBoundsEx;
 import core.exception.UnallowedEx;
 import core.ships.MotherShip;
 
@@ -29,7 +33,7 @@ public class GameWrapper {
 		setBoard(new GameBoard(DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT));
 		
 		// TODO: Use FactoryPattern ?
-		motherShip = new MotherShip();
+		motherShip = new MotherShip(this);
 	}
 
 	// --- ACCESSORS ---
@@ -51,27 +55,53 @@ public class GameWrapper {
 
 	// --- PUBLIC METHODS ---
 	public void startGame() {
-		spawnMotherShip();		
+		spawnMotherShip();
+		updateInterfaces();
 	}
 	
 	// TODO DEBUG: Only for testing purposes
-	public void addAction(Action act) {
+	public void addAction(Action act) throws InvalidArgumentEx {
+		if (act==null) throw new InvalidArgumentEx("Action can't be null");
 		actTodo.addLast(act);
 	}
 	
-	public void undo() {
+	public void undo() throws InvalidActionEx {
 		Action act = actDone.pollFirst();
-		if (act!=null) {
-			act.undoAction();
+		if (act==null) return;
+		try {
+			act.undoAction(this);
+			updateInterfaces();
+		} catch (GameEx e) {
+			throw new InvalidActionEx(e);
 		}
 	}
 	
+	public boolean canUndo() {
+		return !actDone.isEmpty();
+	}
+	
 	// TODO DEBUG: Only for testing purposes
-	public void tick() {
-		Action act = actTodo.pollFirst();
-		if (act!=null) {
-			act.doAction();
-			actDone.addFirst(act);
+	public void tick() throws InvalidActionEx {
+		try {
+			motherShip.move();
+		} catch (NotInitializedEx e1) {
+			System.err.println("Mothership was not spawned !");
+		}
+		
+		Random alea = new Random();
+		if (alea.nextInt(3)!=0) {
+			
+		}
+		
+		while(!actTodo.isEmpty()) {
+			Action act = actTodo.pollFirst();
+			try {
+				act.doAction(this);
+				actDone.addFirst(act);
+				updateInterfaces();
+			} catch (GameEx e) {
+				throw new InvalidActionEx(e);
+			}
 		}
 	}
 
@@ -83,14 +113,26 @@ public class GameWrapper {
 		boolean shipSpawned = false;
 		while (!shipSpawned) {
 			try {
-				x = alea.nextInt(bW);
-				y = alea.nextInt(bH);
+				x = alea.nextInt(bW-1)+1;
+				y = alea.nextInt(bH-1)+1;
 				
-				board.moveShip(x,y,getMotherShip());
+				BoardTile tile = board.getTile(x, y);
+				if (tile.getType()==BoardTileType.BLACKHOLE) throw new UnallowedEx("Invalid spawn position.");
+				board.spawnShip(getMotherShip(), tile);
 				shipSpawned = true;
-			} catch (UnallowedEx ex) {
+			} catch (UnallowedEx e) {
 				// Ignore
+			} catch (OutOfBoundsEx e) {
+				System.err.println("[EXCEPT] Random spawn position was invalid.");
+			} catch (InvalidArgumentEx e) {
+				System.err.println("[EXCEPT] Random spawn position was invalid.");
 			}
+		}
+	}
+
+	private void updateInterfaces() {
+		for (UiWrapper ui : interfaces) {
+			ui.updateBoard(board);
 		}
 	}
 }
