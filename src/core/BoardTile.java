@@ -4,14 +4,18 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import core.exception.InvalidArgumentEx;
 import core.exception.OutOfBoundsEx;
+import core.ships.EnemyShip;
 import core.ships.Ship;
+import core.ships.mothership.MotherShip;
 
 public class BoardTile {	
 	private BoardTileType type;
 	private int xPos, yPos;
 	private GameBoard myBoard;
-	private ArrayList<Ship> ships = new ArrayList<>();
+	private ArrayList<EnemyShip> enemies;
+	private boolean motherShip;
 	
 	// Constructors
 	public BoardTile(GameBoard myBoard, int xPos, int yPos, BoardTileType type) {
@@ -19,6 +23,7 @@ public class BoardTile {
 		setX(xPos);
 		setY(yPos);
 		this.type = type;
+		enemies = new ArrayList<>();
 	}
 
 	// Getters and Setters
@@ -46,16 +51,30 @@ public class BoardTile {
 		this.yPos = yPos;
 	}
 
-	public List<Ship> getShips() {
-		return ships;
+	public ArrayList<EnemyShip> getEnemies() {
+		return enemies;
 	}
 
-	public void addShip(Ship ship) {
-		this.ships.add(ship);
+	public void addShip(Ship ship) throws InvalidArgumentEx {
+		if (ship instanceof EnemyShip)
+			this.enemies.add((EnemyShip) ship);
+		else if (ship instanceof MotherShip)
+			this.motherShip = true;
+		else throw new InvalidArgumentEx("Unknown type of ship");
 	}
 
-	public boolean removeShip(Ship ship) {
-		return this.ships.remove(ship);
+	public boolean removeShip(Ship ship) throws InvalidArgumentEx {
+		if (ship instanceof EnemyShip)
+			return this.enemies.remove((EnemyShip) ship);
+		else if (ship instanceof MotherShip) {
+			if (!this.motherShip) return false;
+			this.motherShip = false;
+			return true;
+		} else throw new InvalidArgumentEx("Unknown type of ship");
+	}
+
+	public boolean hasMotherShip() {
+		return this.motherShip;
 	}
 	
 	public BoardTileType getType() {

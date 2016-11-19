@@ -10,4 +10,9 @@ public abstract class Action {
 	
 	public abstract void undoAction(GameWrapper game) throws GameEx;
 
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName();
+	}
+	
 }

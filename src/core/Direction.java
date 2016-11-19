@@ -1,5 +1,6 @@
 package core;
 
+import java.awt.Point;
 import java.util.Random;
 
 public enum Direction {
@@ -47,6 +48,22 @@ public enum Direction {
 		case 5: return BOTTOM_LEFT;
 		case 6: return BOTTOM;
 		default: return BOTTOM_RIGHT;
+		}
+	}
+	
+	public static Direction fromRelativePoint(Point p) {		
+		if (p.y<0) {
+			if (p.x<0) return TOP_LEFT;
+			else if (p.x>0) return TOP_RIGHT;
+			else return TOP;
+		} else if (p.y>0) {
+			if (p.x<0) return BOTTOM_LEFT;
+			else if (p.x>0) return BOTTOM_RIGHT;
+			else return BOTTOM;
+		} else {
+			if (p.x<0) return LEFT;
+			else if (p.x>0) return RIGHT;
+			else return null; // CENTER
 		}
 	}
 }

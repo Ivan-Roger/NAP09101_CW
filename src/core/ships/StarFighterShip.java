@@ -9,9 +9,4 @@ public class StarFighterShip extends EnemyShip {
 		super(game);
 	}
 
-	@Override
-	public void move() throws NotInitializedEx {
-		// TODO Auto-generated method stub
-	}
-
 }

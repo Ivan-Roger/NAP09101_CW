@@ -13,14 +13,18 @@ import core.exception.InvalidArgumentEx;
 import core.exception.NotInitializedEx;
 import core.exception.OutOfBoundsEx;
 import core.exception.UnallowedEx;
-import core.ships.MotherShip;
+import core.ships.EnemyShip;
 import core.ships.StarFighterShip;
+import core.ships.mothership.MotherShip;
+import core.ships.mothership.MotherShipFactory;
+import core.ships.mothership.ShipBehaviourEnum;
 
 public class GameWrapper {
 	
 	// --- CONSTANTS ---
 	public static final int DEFAULT_BOARD_WIDTH = 4;
 	public static final int DEFAULT_BOARD_HEIGHT = 4;
+	public static final ShipBehaviourEnum  DEFAULT_MOTHERSHIP_BEHAVIOUR = ShipBehaviourEnum.ATTACK_MODE;
 	
 	// --- VARIABLES ---
 	private ArrayList<UiWrapper> interfaces = new ArrayList<>();
@@ -32,10 +36,14 @@ public class GameWrapper {
 	
 	// --- CONSTRUCTORS ---
 	public GameWrapper() throws InvalidArgumentEx {
-		setBoard(new GameBoard(DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT));
+		this(DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT);
+	}
+	
+	public GameWrapper(int width, int height) throws InvalidArgumentEx {
+		setBoard(new GameBoard(this, width, height));
 		
 		// TODO: Use FactoryPattern ?
-		motherShip = new MotherShip(this);
+		motherShip = MotherShipFactory.create(this, DEFAULT_MOTHERSHIP_BEHAVIOUR);
 	}
 
 	// --- ACCESSORS ---
@@ -58,13 +66,16 @@ public class GameWrapper {
 	// --- PUBLIC METHODS ---
 	public void startGame() {
 		spawnMotherShip();
-		updateInterfaces();
+		for (UiWrapper ui : interfaces) {
+			ui.startGame(board);
+		}
 	}
 	
-	// TODO DEBUG: Only for testing purposes
+	// TODO DEBUG: Only for testing purposes (?)
 	public void addAction(Action act) throws InvalidArgumentEx {
 		if (act==null) throw new InvalidArgumentEx("Action can't be null");
 		actTodo.addLast(act);
+		System.out.println("ACTION | Registered > "+act);
 	}
 	
 	public void undo() throws InvalidActionEx {
@@ -82,12 +93,19 @@ public class GameWrapper {
 		return !actDone.isEmpty();
 	}
 	
-	// TODO DEBUG: Only for testing purposes
+	// TODO DEBUG: Public only for testing purposes
 	public void tick() throws InvalidActionEx {
+		System.out.println(" TICK  | --- New turn ---");
+		
 		try {
+			for (EnemyShip s : board.getEnemyShips()) {
+				s.move();
+			}
+			motherShip.act();
 			motherShip.move();
-		} catch (NotInitializedEx e1) {
-			System.err.println("Mothership was not spawned !");
+		} catch (NotInitializedEx e) {
+			// TODO Unexpected: Ship not spawned
+			System.err.println("Ship was not spawned !");
 		}
 		
 		Random alea = new Random();
@@ -96,10 +114,10 @@ public class GameWrapper {
 			try {
 				addAction(new ShipSpawnAction(ship, board.getTile(0, 0)));
 			} catch (InvalidArgumentEx e) {
-				// TODO Auto-generated catch block
+				// TODO Exception, Impossible: Ship already spawned
 				e.printStackTrace();
 			} catch (OutOfBoundsEx e) {
-				// TODO Auto-generated catch block
+				// TODO Exception: Invalid board. No tile at 0,0
 				e.printStackTrace();
 			}
 		}
@@ -129,7 +147,7 @@ public class GameWrapper {
 			} catch (OutOfBoundsEx e) {
 				System.err.println("[EXCEPT] Random spawn position was invalid.");
 			} catch (InvalidArgumentEx e) {
-				System.err.println("[EXCEPT] Random spawn position was invalid.");
+				System.err.println("Mothership already spawned.");
 			}
 		}
 	}
@@ -149,5 +167,11 @@ public class GameWrapper {
 		for (UiWrapper ui : interfaces) {
 			ui.updateBoard(board);
 		}
+	}
+
+	public void end(boolean win) {
+		System.out.println("\n---------------------------------------------------------------------------\n"
+				+ "\t\t YOU "+(win?"WON":"LOST")+" !");
+		System.exit(0);
 	}
 }

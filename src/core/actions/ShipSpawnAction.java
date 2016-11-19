@@ -27,5 +27,10 @@ public class ShipSpawnAction extends Action {
 	public void undoAction(GameWrapper game) {
 		game.getBoard().removeShip(ship);
 	}
+	
+	@Override
+	public String toString() {
+		return super.toString()+": "+ship+" at ["+pos.getX()+","+pos.getY()+"]";
+	}
 
 }

@@ -21,5 +21,7 @@ public abstract class UiWrapper {
 	}
 	
 	public abstract void updateBoard(GameBoard board);
+
+	public abstract void startGame(GameBoard board);
 	
 }

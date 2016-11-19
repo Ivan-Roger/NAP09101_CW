@@ -12,9 +12,11 @@ public class ShipMoveAction extends Action {
 	private Ship ship;
 	private BoardTile from;
 	private BoardTile to;
+	private Direction dir;
 
 	public ShipMoveAction(Ship ship, Direction direction) throws InvalidArgumentEx, OutOfBoundsEx {
 		this.ship = ship;
+		this.dir = direction;
 		
 		BoardTile oldPos = ship.getPosition();
 		if (oldPos==null) throw new InvalidArgumentEx("Ship doesn't have a position, use ShipSpawnAction");
@@ -30,6 +32,11 @@ public class ShipMoveAction extends Action {
 	@Override
 	public void undoAction(GameWrapper game) throws InvalidArgumentEx, NotInitializedEx {
 		game.getBoard().moveShip(ship, from);
+	}
+	
+	@Override
+	public String toString() {
+		return super.toString()+": "+ship+" going "+dir;
 	}
 
 }

@@ -1,53 +1,45 @@
 package main;
 
-import core.Direction;
 import core.GameWrapper;
-import core.actions.ShipMoveAction;
 import core.exception.InvalidActionEx;
 import core.exception.InvalidArgumentEx;
-import core.exception.OutOfBoundsEx;
 import ui.TextUI;
+import ui.gui.GraphicUI;
 
 public class Main {
 
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
-		System.out.println("INIT");
+		System.out.println(" INIT  | Launching Sky Wars ...");
 		
 		try {
 			GameWrapper game = new GameWrapper();
-			@SuppressWarnings("unused")
-			TextUI textUi = new TextUI(game);
+			//TextUI textUi = new TextUI(game);
+			GraphicUI gui = new GraphicUI(game);
 			
 			game.startGame();
 			
-			for (int i=0; i<20; i++) {
-				Direction direction = Direction.random();
-				System.out.println("Moving "+direction);
+			for (;;) {
 				try {
-					game.addAction(new ShipMoveAction(game.getMotherShip(), direction));
-					game.tick();
-				} catch (OutOfBoundsEx e) {
-					System.err.println("Wrong move");
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Remove: For the DEBUG sleep
+					e.printStackTrace();
 				}
+				game.tick();
 			}
 			
-			System.out.println("\n---------------------------------------------------------------------------\n");
-			
+			/*
 			while (game.canUndo()) {
 				game.undo();
 			}
-			
-			System.out.println("MotherShip: "+game.getMotherShip().getPosition().toPoint());
-			
+			*/
 		} catch (InvalidArgumentEx e) {
 			System.err.println("Unable to create a Game instance !");
 			System.exit(-1);
 		} catch (InvalidActionEx e) {
 			System.err.println(e.getMessage());
 		}
-		
-		
-		
 	}
 
 }
