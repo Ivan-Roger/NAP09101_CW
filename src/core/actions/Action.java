@@ -1,10 +1,14 @@
 package core.actions;
 
 import core.GameWrapper;
-import core.exception.GameEx;
+import core.events.GameEvent;
+import core.exceptions.GameEx;
 
 public abstract class Action {
 	protected GameWrapper context;
+
+	public abstract GameEvent getDoEvent();
+	public abstract GameEvent getUndoEvent();
 	
 	public abstract void doAction(GameWrapper game) throws GameEx;
 	

@@ -6,15 +6,15 @@ import java.util.Random;
 
 import ui.UiWrapper;
 import core.actions.Action;
-import core.actions.ShipSpawnAction;
-import core.exception.GameEx;
-import core.exception.InvalidActionEx;
-import core.exception.InvalidArgumentEx;
-import core.exception.NotInitializedEx;
-import core.exception.OutOfBoundsEx;
-import core.exception.UnallowedEx;
-import core.ships.EnemyShip;
-import core.ships.StarFighterShip;
+import core.events.GameEvent;
+import core.events.GameOverEvent;
+import core.events.GameStartEvent;
+import core.events.ShipSpawnEvent;
+import core.exceptions.GameEx;
+import core.exceptions.InvalidActionEx;
+import core.exceptions.InvalidArgumentEx;
+import core.exceptions.OutOfBoundsEx;
+import core.exceptions.UnallowedEx;
 import core.ships.mothership.MotherShip;
 import core.ships.mothership.MotherShipFactory;
 import core.ships.mothership.ShipBehaviourEnum;
@@ -28,9 +28,12 @@ public class GameWrapper {
 	
 	// --- VARIABLES ---
 	private ArrayList<UiWrapper> interfaces = new ArrayList<>();
+	private GameWorker myWorker;
 	
 	private GameBoard board;
 	private MotherShip motherShip;
+	private int turn; 
+	private boolean gameOver = true;
 	private ArrayDeque<Action> actTodo = new ArrayDeque<>();
 	private ArrayDeque<Action> actDone = new ArrayDeque<>();
 	
@@ -42,8 +45,8 @@ public class GameWrapper {
 	public GameWrapper(int width, int height) throws InvalidArgumentEx {
 		setBoard(new GameBoard(this, width, height));
 		
-		// TODO: Use FactoryPattern ?
 		motherShip = MotherShipFactory.create(this, DEFAULT_MOTHERSHIP_BEHAVIOUR);
+		myWorker = new GameWorker(this);
 	}
 
 	// --- ACCESSORS ---
@@ -62,20 +65,32 @@ public class GameWrapper {
 	public MotherShip getMotherShip() {
 		return motherShip;
 	}
+	
+	public boolean isOver() {
+		return gameOver;
+	}
+	
+	public int getTurn() {
+		return turn;
+	}
+	
+	public void nextTurn() {
+		turn++;
+	}
 
 	// --- PUBLIC METHODS ---
 	public void startGame() {
+		updateInterfaces(new GameStartEvent(board));
 		spawnMotherShip();
-		for (UiWrapper ui : interfaces) {
-			ui.startGame(board);
-		}
+		gameOver = false;
+		turn = 0;
+		myWorker.start();
 	}
 	
-	// TODO DEBUG: Only for testing purposes (?)
 	public void addAction(Action act) throws InvalidArgumentEx {
 		if (act==null) throw new InvalidArgumentEx("Action can't be null");
 		actTodo.addLast(act);
-		System.out.println("ACTION | Registered > "+act);
+		//System.out.println("ACTION | Registered > "+act);
 	}
 	
 	public void undo() throws InvalidActionEx {
@@ -83,7 +98,7 @@ public class GameWrapper {
 		if (act==null) return;
 		try {
 			act.undoAction(this);
-			updateInterfaces();
+			updateInterfaces(act.getUndoEvent());
 		} catch (GameEx e) {
 			throw new InvalidActionEx(e);
 		}
@@ -93,38 +108,26 @@ public class GameWrapper {
 		return !actDone.isEmpty();
 	}
 	
-	// TODO DEBUG: Public only for testing purposes
-	public void tick() throws InvalidActionEx {
-		System.out.println(" TICK  | --- New turn ---");
-		
-		try {
-			for (EnemyShip s : board.getEnemyShips()) {
-				s.move();
-			}
-			motherShip.act();
-			motherShip.move();
-		} catch (NotInitializedEx e) {
-			// TODO Unexpected: Ship not spawned
-			System.err.println("Ship was not spawned !");
+	public void play() {
+		if (gameOver) return; // TODO: Throw an exception
+		if (!myWorker.isAlive()) return; // TODO: Throw an exception
+		System.out.println("WRAPPER| Notify thread ...");
+		synchronized (myWorker) {
+			myWorker.notify();
 		}
-		
-		Random alea = new Random();
-		if (alea.nextInt(3)!=0) {
-			StarFighterShip ship = new StarFighterShip(this);
-			try {
-				addAction(new ShipSpawnAction(ship, board.getTile(0, 0)));
-			} catch (InvalidArgumentEx e) {
-				// TODO Exception, Impossible: Ship already spawned
-				e.printStackTrace();
-			} catch (OutOfBoundsEx e) {
-				// TODO Exception: Invalid board. No tile at 0,0
-				e.printStackTrace();
-			}
+	}
+
+	public void updateInterfaces(GameEvent event) {
+		for (UiWrapper ui : interfaces) {
+			ui.update(event);
 		}
-		
-		while(!actTodo.isEmpty()) {
-			performAction();
-		}
+	}
+
+	public void end(boolean win) {
+		System.out.println("\n---------------------------------------------------------------------------\n"
+				+ "\t\t YOU "+(win?"WON":"LOST")+" !");
+		gameOver=true;
+		updateInterfaces(new GameOverEvent(win));
 	}
 
 	// --- PRIVATE METHODS ---
@@ -150,28 +153,20 @@ public class GameWrapper {
 				System.err.println("Mothership already spawned.");
 			}
 		}
+		updateInterfaces(new ShipSpawnEvent(motherShip));
 	}
 	
-	private void performAction() throws InvalidActionEx {
-		Action act = actTodo.pollFirst();
-		try {
-			act.doAction(this);
-			actDone.addFirst(act);
-			updateInterfaces();
-		} catch (GameEx e) {
-			throw new InvalidActionEx(e);
+	public void performActions() {
+		while (!actTodo.isEmpty()) {
+			Action act = actTodo.pollFirst();
+			try {
+				act.doAction(this);
+				actDone.addFirst(act);
+				updateInterfaces(act.getDoEvent());
+			} catch (GameEx e) {
+				// TODO: Handle error:
+				e.printStackTrace();
+			}
 		}
-	}
-
-	private void updateInterfaces() {
-		for (UiWrapper ui : interfaces) {
-			ui.updateBoard(board);
-		}
-	}
-
-	public void end(boolean win) {
-		System.out.println("\n---------------------------------------------------------------------------\n"
-				+ "\t\t YOU "+(win?"WON":"LOST")+" !");
-		System.exit(0);
 	}
 }

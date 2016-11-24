@@ -1,7 +1,10 @@
 package ui.gui;
 
-import core.GameBoard;
 import core.GameWrapper;
+import core.events.GameEvent;
+import core.events.GameEventType;
+import core.events.GameOverEvent;
+import core.events.GameStartEvent;
 import ui.UiWrapper;
 
 public class GraphicUI extends UiWrapper {
@@ -14,12 +17,36 @@ public class GraphicUI extends UiWrapper {
 	}
 
 	@Override
-	public void startGame(GameBoard board) {
-		gameF.start(board);
-	}
+	public void update(GameEvent evt) {
+		GameEventType type = evt.getType();
+		if (
+			type == GameEventType.GAME_START
+		) {
+			GameStartEvent event = (GameStartEvent) evt;
+			gameF.start(event.getBoard());
+		}
+		
+		if (
+			type == GameEventType.GAME_OVER
+		) {
+			GameOverEvent event = (GameOverEvent) evt;
+			boolean won = event.isPlayerWinner();
+			gameF.end(won);
+		}
 
-	@Override
-	public void updateBoard(GameBoard board) {
-		gameF.updateBoard(board);
+		if (
+			type == GameEventType.GAME_START		||
+			type == GameEventType.NEW_TURN			||
+			type == GameEventType.TURN_OVER			||
+			type == GameEventType.FIGHT				||
+			type == GameEventType.SHIP_SPAWN		||
+			type == GameEventType.SHIP_MOVE			||
+			type == GameEventType.SHIP_DESTROYED 	||
+			type == GameEventType.SHIP_REMOVED 		||
+			type == GameEventType.GAME_OVER
+		) {
+			gameF.update(evt);
+		}
+		
 	}
 }

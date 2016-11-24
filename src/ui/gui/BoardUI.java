@@ -6,7 +6,12 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 import core.GameBoard;
-import core.exception.OutOfBoundsEx;
+import core.events.GameEvent;
+import core.events.GameEventType;
+import core.events.ShipMoveEvent;
+import core.events.ShipRemovedEvent;
+import core.events.ShipSpawnEvent;
+import core.exceptions.OutOfBoundsEx;
 
 @SuppressWarnings("serial")
 public class BoardUI extends JPanel {
@@ -18,7 +23,7 @@ public class BoardUI extends JPanel {
 	}
 
 	private void initContent(GameBoard board) {
-		this.setLayout(new GridLayout(board.getWidth(), board.getHeight()));
+		this.setLayout(new GridLayout(board.getHeight(), board.getWidth()));
 
 		try {
 			for (int i=0; i<board.getSize(); i++) {
@@ -32,14 +37,17 @@ public class BoardUI extends JPanel {
 		}
 	}
 
-	public void updateBoard(GameBoard board) {
-		try {
-			for (int i=0; i<board.getSize(); i++) {
-					tiles.get(i).update(board.getTile(i));
-			}
-		} catch (OutOfBoundsEx e) {
-			// TODO Unexpected exception, display error message and quit
-			e.printStackTrace();
+	public void update(GameEvent evt) {
+		if (evt.getType()==GameEventType.SHIP_SPAWN) {
+			ShipSpawnEvent event = (ShipSpawnEvent) evt;
+			tiles.get(event.getPosition().getIndex()).update(event.getPosition());
+		} else if (evt.getType()==GameEventType.SHIP_MOVE) {
+			ShipMoveEvent event = (ShipMoveEvent) evt;
+			tiles.get(event.getOrigin().getIndex()).update(event.getOrigin());
+			tiles.get(event.getDestination().getIndex()).update(event.getDestination());
+		} else if (evt.getType()==GameEventType.SHIP_REMOVED) {
+			ShipRemovedEvent event = (ShipRemovedEvent) evt;
+			tiles.get(event.getPosition().getIndex()).update(event.getPosition());
 		}
 	}
 }

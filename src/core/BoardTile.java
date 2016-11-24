@@ -2,53 +2,51 @@ package core;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.List;
 
-import core.exception.InvalidArgumentEx;
-import core.exception.OutOfBoundsEx;
+import core.exceptions.InvalidArgumentEx;
+import core.exceptions.OutOfBoundsEx;
 import core.ships.EnemyShip;
 import core.ships.Ship;
 import core.ships.mothership.MotherShip;
 
 public class BoardTile {	
 	private BoardTileType type;
-	private int xPos, yPos;
+	private int index;
 	private GameBoard myBoard;
 	private ArrayList<EnemyShip> enemies;
 	private boolean motherShip;
 	
 	// Constructors
-	public BoardTile(GameBoard myBoard, int xPos, int yPos, BoardTileType type) {
+	public BoardTile(GameBoard myBoard, int index, BoardTileType type) {
 		setBoard(myBoard);
-		setX(xPos);
-		setY(yPos);
+		setIndex(index);
 		this.type = type;
 		enemies = new ArrayList<>();
 	}
 
 	// Getters and Setters
+	private void setBoard(GameBoard myBoard) {
+		this.myBoard = myBoard;
+	}
+	
 	public GameBoard getBoard() {
 		return myBoard;
 	}
 
-	private void setBoard(GameBoard myBoard) {
-		this.myBoard = myBoard;
+	private void setIndex(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
 	}
 
 	public int getX() {
-		return xPos;
-	}
-
-	private void setX(int xPos) {
-		this.xPos = xPos;
+		return index%myBoard.getWidth();
 	}
 
 	public int getY() {
-		return yPos;
-	}
-
-	private void setY(int yPos) {
-		this.yPos = yPos;
+		return index/myBoard.getWidth();
 	}
 
 	public ArrayList<EnemyShip> getEnemies() {
@@ -82,11 +80,11 @@ public class BoardTile {
 	}
 	
 	public Point toPoint() {
-		return new Point(this.xPos, this.yPos);
+		return new Point(getX(), getY());
 	}
 	
 	public BoardTile getNeighbour(Direction direction) throws OutOfBoundsEx {
-		return myBoard.getTile(xPos+direction.getOffsetX(), yPos+direction.getOffsetY());
+		return myBoard.getTile(getX()+direction.getOffsetX(), getY()+direction.getOffsetY());
 	}
 
 }

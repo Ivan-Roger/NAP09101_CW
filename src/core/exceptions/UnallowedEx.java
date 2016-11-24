@@ -1,4 +1,4 @@
-package core.exception;
+package core.exceptions;
 
 @SuppressWarnings("serial")
 public class UnallowedEx extends GameEx {

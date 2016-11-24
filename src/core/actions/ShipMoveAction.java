@@ -3,9 +3,12 @@ package core.actions;
 import core.BoardTile;
 import core.Direction;
 import core.GameWrapper;
-import core.exception.InvalidArgumentEx;
-import core.exception.NotInitializedEx;
-import core.exception.OutOfBoundsEx;
+import core.events.GameEvent;
+import core.events.GameEventType;
+import core.events.ShipMoveEvent;
+import core.exceptions.InvalidArgumentEx;
+import core.exceptions.NotInitializedEx;
+import core.exceptions.OutOfBoundsEx;
 import core.ships.Ship;
 
 public class ShipMoveAction extends Action {
@@ -14,6 +17,8 @@ public class ShipMoveAction extends Action {
 	private BoardTile to;
 	private Direction dir;
 
+	public GameEventType getEventType() { return GameEventType.SHIP_MOVE; }
+	
 	public ShipMoveAction(Ship ship, Direction direction) throws InvalidArgumentEx, OutOfBoundsEx {
 		this.ship = ship;
 		this.dir = direction;
@@ -37,6 +42,16 @@ public class ShipMoveAction extends Action {
 	@Override
 	public String toString() {
 		return super.toString()+": "+ship+" going "+dir;
+	}
+
+	@Override
+	public GameEvent getDoEvent() {
+		return new ShipMoveEvent(ship, from, to);
+	}
+
+	@Override
+	public GameEvent getUndoEvent() {
+		return new ShipMoveEvent(ship, to, from);
 	}
 
 }

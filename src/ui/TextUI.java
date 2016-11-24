@@ -3,7 +3,8 @@ package ui;
 import core.BoardTile;
 import core.GameBoard;
 import core.GameWrapper;
-import core.exception.OutOfBoundsEx;
+import core.events.GameEvent;
+import core.exceptions.OutOfBoundsEx;
 
 public class TextUI extends UiWrapper {
 
@@ -14,15 +15,18 @@ public class TextUI extends UiWrapper {
 
 	// --- INHERITED METHODS ---
 	@Override
-	public void startGame(GameBoard board) {
-		System.out.println("Game started !\n---------------------");
+	public void update(GameEvent event) {
+		switch (event.getType()) {
+		case GAME_START:
+			System.out.println("Game started !\n---------------------");
+			return;
+		default: // TODO: List corresponding events, throw error on default
+			this.draw();
+			return;
+		}
 	}
-
-	@Override
-	public void updateBoard(GameBoard board) {
-		this.draw();
-	}
-
+	
+	
 	// --- PRIVATE METHODS ---
 	private void draw() {
 		final String horBorder = "-----";

@@ -2,9 +2,9 @@ package core;
 
 import java.util.ArrayList;
 
-import core.exception.InvalidArgumentEx;
-import core.exception.NotInitializedEx;
-import core.exception.OutOfBoundsEx;
+import core.exceptions.InvalidArgumentEx;
+import core.exceptions.NotInitializedEx;
+import core.exceptions.OutOfBoundsEx;
 import core.ships.EnemyShip;
 import core.ships.Ship;
 
@@ -25,10 +25,9 @@ public class GameBoard {
 		if (height<1 || width<1) throw new InvalidArgumentEx("Invalid board size");
 		ArrayList<BoardTile> res = new ArrayList<>();
 		
-		res.add(new BoardTile(this,0,0,BoardTileType.BLACKHOLE));
+		res.add(new BoardTile(this,0,BoardTileType.BLACKHOLE));
 		for (int i=1; i<width*height; i++) {
-			int y = i/width;
-			res.add(new BoardTile(this,i-y*width,y,BoardTileType.NORMAL));
+			res.add(new BoardTile(this,i,BoardTileType.NORMAL));
 		}
 		
 		return res;

@@ -10,23 +10,34 @@ import javax.swing.JPanel;
 
 import core.GameBoard;
 import core.GameWrapper;
+import core.events.GameEvent;
+import core.events.GameEventType;
 
 @SuppressWarnings("serial")
 public class GameFrameUI extends JFrame {
+	private boolean gameOver = true;
 	private BoardUI boardUi;
+	private ControlsUI controlsUi;
 
 	public GameFrameUI(GameWrapper game) {
 		super("Sky Wars - Game");
-		this.setSize(900, 700);
+		this.setSize(1000, 700);
 		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		this.setLocationRelativeTo(null);
 		this.setResizable(false);
+		
+		// TODO: Clean this listener
 		this.addWindowListener(new WindowListener() {
 			@Override
 			public void windowOpened(WindowEvent e) {}
 
 			@Override
 			public void windowClosing(WindowEvent e) {
+				if (gameOver) {
+					System.exit(0);
+					// TODO: Return to menu
+				}
+				
 				int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to quit ?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 				if (result==JOptionPane.YES_OPTION) System.exit(0);
 			}
@@ -58,15 +69,42 @@ public class GameFrameUI extends JFrame {
 		boardUi = new BoardUI(board);
 		body.add(boardUi, BorderLayout.CENTER);
 		
+		controlsUi = new ControlsUI(game);
+		body.add(controlsUi, BorderLayout.EAST);
+		
 		this.add(body);
 	}
 
 	public void start(GameBoard board) {
 		this.setVisible(true);
+		gameOver = false;
 	}
 
-	public void updateBoard(GameBoard board) {
-		boardUi.updateBoard(board);
+	public void update(GameEvent event) {
+		GameEventType type = event.getType();
+		if (
+			type == GameEventType.GAME_START ||
+			type == GameEventType.NEW_TURN ||
+			type == GameEventType.SHIP_SPAWN ||
+			type == GameEventType.FIGHT ||
+			type == GameEventType.SHIP_DESTROYED ||
+			type == GameEventType.TURN_OVER
+		) {
+			controlsUi.update(event);
+		}
+
+		if (
+			type == GameEventType.SHIP_SPAWN ||
+			type == GameEventType.SHIP_MOVE ||
+			type == GameEventType.SHIP_REMOVED
+		) {
+			boardUi.update(event);
+		}
+	}
+
+	public void end(boolean won) {
+		gameOver = true;
+		JOptionPane.showMessageDialog(null, "You "+(won?"won":"lost")+" the game !", "Sky Wars - Game Over", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 }

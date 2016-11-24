@@ -1,7 +1,7 @@
 package ui;
 
-import core.GameBoard;
 import core.GameWrapper;
+import core.events.GameEvent;
 
 public abstract class UiWrapper {
 	
@@ -19,9 +19,7 @@ public abstract class UiWrapper {
 	protected GameWrapper getGame() {
 		return game;
 	}
-	
-	public abstract void updateBoard(GameBoard board);
 
-	public abstract void startGame(GameBoard board);
+	public abstract void update(GameEvent event);
 	
 }

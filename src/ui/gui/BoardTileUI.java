@@ -3,9 +3,13 @@ package ui.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -34,9 +38,9 @@ public class BoardTileUI extends JPanel {
 		this.add(new JLabel(tile.getX()+", "+tile.getY(), JLabel.CENTER), BorderLayout.NORTH);
 		
 		JPanel shipGrid = new JPanel();
-		shipGrid.setLayout(new GridLayout(10,2));
+		shipGrid.setLayout(new GridLayout(0,3));
 		shipGrid.setBackground(backColor);
-		for (int i=0; i<10*2; i++) {
+		for (int i=0; i<4; i++) {
 			JLabel ship = new JLabel("", JLabel.CENTER);
 			ship.setForeground(Color.LIGHT_GRAY);
 			shipList.add(ship);
@@ -47,17 +51,29 @@ public class BoardTileUI extends JPanel {
 	
 	public void update(BoardTile tile) {
 		ArrayList<EnemyShip> ships = tile.getEnemies();
-		int i = 0;
 		if (tile.hasMotherShip()) {
-			shipList.get(i).setText("MOTHER SHIP");
-			i++;
-		}
-		for (; i<10*2; i++) {
-			Ship s = null;
 			try {
-				s = ships.get(i);
-			} catch (IndexOutOfBoundsException e) {}
-			shipList.get(i).setText(s!=null?s.getClass().getSimpleName():"");
-		}
+				//System.out.println(" DEBUG | Loading image MotherShip");
+				BufferedImage img = ImageIO.read(this.getClass().getResourceAsStream("assets/MotherShip.png"));
+				ImageIcon icon = new ImageIcon(img);
+				shipList.get(0).setIcon(icon);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else shipList.get(0).setIcon(null);
+		
+		if (ships.size()>0) {
+			EnemyShip s = ships.get(0);
+			try {
+				//System.out.println(" DEBUG | Loading image for: "+s);
+				BufferedImage img = ImageIO.read(this.getClass().getResourceAsStream("assets/"+s.getClass().getSimpleName()+".png"));
+				ImageIcon icon = new ImageIcon(img);
+				shipList.get(1).setIcon(icon);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else shipList.get(1).setIcon(null);
 	}
 }
