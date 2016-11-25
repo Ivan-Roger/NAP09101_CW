@@ -9,7 +9,10 @@ import core.exceptions.InvalidArgumentEx;
 import core.exceptions.NotInitializedEx;
 import core.exceptions.OutOfBoundsEx;
 import core.ships.EnemyShip;
+import core.ships.Ship;
+import core.ships.StarCruiserShip;
 import core.ships.StarFighterShip;
+import core.ships.StarShooterShip;
 
 public class GameWorker extends Thread {
 	private GameWrapper game;
@@ -48,7 +51,12 @@ public class GameWorker extends Thread {
 			
 			Random alea = new Random();
 			if (alea.nextInt(3)!=0) {
-				StarFighterShip ship = new StarFighterShip(game);
+				Ship ship;
+				switch (alea.nextInt(3)) {
+				case 0: ship = new StarFighterShip(game); break;
+				case 1: ship = new StarShooterShip(game); break;
+				default: ship = new StarCruiserShip(game); break;
+				}
 				try {
 					game.addAction(new ShipSpawnAction(ship, game.getBoard().getTile(0, 0)));
 				} catch (InvalidArgumentEx e) {
@@ -61,15 +69,6 @@ public class GameWorker extends Thread {
 			}
 	
 			game.performActions();
-			
-			if (game.getMotherShip().getPosition().getEnemies().size()>0) {
-				try {
-					Thread.sleep(750);
-				} catch (InterruptedException e) {
-					// TODO Unable to sleep
-					e.printStackTrace();
-				}
-			}
 			
 			game.getMotherShip().act();
 			

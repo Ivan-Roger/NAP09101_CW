@@ -13,6 +13,8 @@ public abstract class EnemyShip extends Ship {
 	public EnemyShip(GameWrapper game) {
 		super(game);
 	}
+	
+	public abstract EnemyShipType getType();
 
 	/* // Clever move towards MotherShip
 	@Override

@@ -13,12 +13,14 @@ public class GameBoard {
 	private int boardWidth;
 	private ArrayList<BoardTile> board;
 	private ArrayList<EnemyShip> ships;
+	private int killCount;
 	
 	public GameBoard(GameWrapper game, int width, int height) throws InvalidArgumentEx {
 		this.game = game;
 		boardWidth = width;
 		board = buildBoard(width, height);
 		ships = new ArrayList<>();
+		killCount = 0;
 	}
 	
 	private ArrayList<BoardTile> buildBoard(int width, int height) throws InvalidArgumentEx {
@@ -69,6 +71,10 @@ public class GameBoard {
 	public ArrayList<EnemyShip> getEnemyShips() {
 		return this.ships;
 	}
+
+	public int getKillCount() {
+		return this.killCount;
+	}
 	
 	public void moveShip(Ship ship, BoardTile pos) throws NotInitializedEx, InvalidArgumentEx {
 		if (pos==null) throw new InvalidArgumentEx("Invalid position.");
@@ -90,8 +96,13 @@ public class GameBoard {
 	}
 
 	public void removeShip(Ship ship) {
-		if (ship instanceof EnemyShip) ships.remove((EnemyShip) ship);
+		if (ship instanceof EnemyShip) {
+			ships.remove((EnemyShip) ship);
+			killCount++;
+		}
+		
 		if (ships.size()==0) game.end(true);
+		
 		try {
 			ship.getPosition().removeShip(ship);
 		} catch (InvalidArgumentEx e) {

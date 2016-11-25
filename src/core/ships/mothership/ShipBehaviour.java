@@ -4,6 +4,8 @@ import core.BoardTile;
 
 public interface ShipBehaviour {
 	
-	public void act(MotherShip me, BoardTile position);
+	public boolean act(MotherShip me, BoardTile position);
+	
+	public ShipBehaviourEnum getBehaviour();
 
 }

@@ -1,7 +1,9 @@
 package core.ships.mothership;
 
+import core.BoardTile;
 import core.GameWrapper;
-import core.events.FightEvent;
+import core.events.FightEndEvent;
+import core.events.FightStartEvent;
 import core.ships.Ship;
 
 public class MotherShip extends Ship {
@@ -15,12 +17,19 @@ public class MotherShip extends Ship {
 	public void setBehaviour(ShipBehaviour behaviour) {
 		this.behaviour = behaviour;
 	}
+	
+	public ShipBehaviourEnum getBehaviour() {
+		return this.behaviour.getBehaviour();
+	}
 
 	public void act() {
-		if (getPosition().getEnemies().size()==0) return;
-		getGame().updateInterfaces(new FightEvent(getPosition()));
+		int enemyCount = getPosition().getEnemies().size();
+		if (enemyCount==0) return;
+		getGame().updateInterfaces(new FightStartEvent(getPosition()));
 		
-		behaviour.act(this, getPosition());
+		BoardTile pos = getPosition();
+		boolean win = behaviour.act(this, getPosition());
+		getGame().updateInterfaces(new FightEndEvent(pos, enemyCount, win));
 	}
 	
 	@Override

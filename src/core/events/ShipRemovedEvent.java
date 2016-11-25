@@ -7,9 +7,9 @@ public class ShipRemovedEvent extends GameEvent {
 	private Ship ship;
 	private BoardTile position;
 	
-	public ShipRemovedEvent(Ship ship) {
+	public ShipRemovedEvent(Ship ship, BoardTile position) {
 		this.ship = ship;
-		this.position = ship.getPosition();
+		this.position = position;
 	}
 
 	@Override

@@ -1,18 +1,17 @@
 package core.events;
 
 import core.BoardTile;
-import core.ships.Ship;
 
-public class FightEvent extends GameEvent {
+public class FightStartEvent extends GameEvent {
 	private BoardTile position;
 	
-	public FightEvent(BoardTile position) {
+	public FightStartEvent(BoardTile position) {
 		this.position = position;
 	}
 
 	@Override
 	public GameEventType getType() {
-		return GameEventType.FIGHT;
+		return GameEventType.FIGHT_START;
 	}
 
 	public BoardTile getPosition() {

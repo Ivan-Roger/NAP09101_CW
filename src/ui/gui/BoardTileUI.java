@@ -3,27 +3,26 @@ package ui.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import core.BoardTile;
 import core.BoardTileType;
-import core.ships.EnemyShip;
+import core.ships.EnemyShipType;
 import core.ships.Ship;
+import core.ships.mothership.MotherShip;
 
 @SuppressWarnings("serial")
 public class BoardTileUI extends JPanel {
-	private ArrayList<JLabel> shipList;
+	private HashMap<String, JLabel> shipList;
+	private HashMap<String, JLabel> shipCountList;
 
 	public BoardTileUI(BoardTile tile) {
-		shipList = new ArrayList<>();
+		shipList = new HashMap<>();
+		shipCountList = new HashMap<>();
 		initContent(tile);
 	}
 
@@ -35,45 +34,70 @@ public class BoardTileUI extends JPanel {
 		this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
 		this.setLayout(new BorderLayout());
 		
-		this.add(new JLabel(tile.getX()+", "+tile.getY(), JLabel.CENTER), BorderLayout.NORTH);
+		//this.add(new JLabel(tile.getX()+", "+tile.getY(), JLabel.CENTER), BorderLayout.NORTH);
 		
-		JPanel shipGrid = new JPanel();
-		shipGrid.setLayout(new GridLayout(0,3));
-		shipGrid.setBackground(backColor);
-		for (int i=0; i<4; i++) {
+		JPanel shipsPanel = new JPanel();
+		shipsPanel.setLayout(new GridLayout(1,2));
+		shipsPanel.setBackground(backColor);
+		
+		JLabel motherShip = new JLabel("", JLabel.CENTER);
+		motherShip.setIcon(BoardUI.getShipIcon(MotherShip.class.getSimpleName()));
+		motherShip.setVisible(false);
+		shipList.put(MotherShip.class.getSimpleName(), motherShip);
+		shipsPanel.add(motherShip);
+		
+		JPanel enemyShipsPanel = new JPanel();
+		enemyShipsPanel.setBackground(backColor);
+		enemyShipsPanel.setLayout(new GridLayout(3,2));
+		for (EnemyShipType type : EnemyShipType.values()) {
 			JLabel ship = new JLabel("", JLabel.CENTER);
-			ship.setForeground(Color.LIGHT_GRAY);
-			shipList.add(ship);
-			shipGrid.add(ship);
+			ship.setIcon(BoardUI.getShipIcon(type.getClassName()));
+			ship.setVisible(false);
+			shipList.put(type.getClassName(), ship);
+			enemyShipsPanel.add(ship);
+			
+			JLabel shipCount = new JLabel("x0", JLabel.CENTER);
+			shipCount.setForeground(Color.LIGHT_GRAY);
+			shipCount.setVisible(false);
+			shipCountList.put(type.getClassName(), shipCount);
+			enemyShipsPanel.add(shipCount);
 		}
-		this.add(shipGrid, BorderLayout.CENTER);
+		shipsPanel.add(enemyShipsPanel);
+		
+		this.add(shipsPanel, BorderLayout.CENTER);
 	}
 	
-	public void update(BoardTile tile) {
-		ArrayList<EnemyShip> ships = tile.getEnemies();
-		if (tile.hasMotherShip()) {
-			try {
-				//System.out.println(" DEBUG | Loading image MotherShip");
-				BufferedImage img = ImageIO.read(this.getClass().getResourceAsStream("assets/MotherShip.png"));
-				ImageIcon icon = new ImageIcon(img);
-				shipList.get(0).setIcon(icon);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	public void addShip(Ship ship) {
+		shipList.get(ship.getClass().getSimpleName()).setVisible(true);
+		if (!(ship instanceof MotherShip)) {
+			JLabel count = shipCountList.get(ship.getClass().getSimpleName());
+			int oldCount = Integer.parseInt(count.getText().substring(1));
+			count.setText("x"+(oldCount+1));
+			if (oldCount==0) count.setVisible(true);
+		}
+	}
+	
+	public void destroyShip(Ship ship) {
+		shipList.get(ship.getClass().getSimpleName()).setIcon(BoardUI.getBlownShipIcon());
+	}
+	
+	public void resetTile(BoardTile tile) {
+		for (EnemyShipType type : EnemyShipType.values()) {
+			shipList.get(type.getClassName()).setIcon(BoardUI.getShipIcon(type.getClassName()));
+		}
+	}
+	
+	public void removeShip(Ship ship) {
+		if (ship instanceof MotherShip) {
+			shipList.get(ship.getClass().getSimpleName()).setVisible(false);
+		} else {
+			JLabel count = shipCountList.get(ship.getClass().getSimpleName());
+			int newCount = Integer.parseInt(count.getText().substring(1))-1;
+			count.setText("x"+newCount);
+			if (newCount==0) {
+				count.setVisible(false);
+				shipList.get(ship.getClass().getSimpleName()).setVisible(false);
 			}
-		} else shipList.get(0).setIcon(null);
-		
-		if (ships.size()>0) {
-			EnemyShip s = ships.get(0);
-			try {
-				//System.out.println(" DEBUG | Loading image for: "+s);
-				BufferedImage img = ImageIO.read(this.getClass().getResourceAsStream("assets/"+s.getClass().getSimpleName()+".png"));
-				ImageIcon icon = new ImageIcon(img);
-				shipList.get(1).setIcon(icon);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else shipList.get(1).setIcon(null);
+		}
 	}
 }

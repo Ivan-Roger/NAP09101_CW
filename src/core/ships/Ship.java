@@ -68,19 +68,20 @@ public abstract class Ship {
 	
 	public void destroy() {
 		alive = false;
-		try {
-			position.removeShip(this);
-		} catch (InvalidArgumentEx e) {
-			// TODO Exception, Impossible: Invalid type of ship
-			e.printStackTrace();
-		}
 		game.updateInterfaces(new ShipDestroyedEvent(this));
-		game.updateInterfaces(new ShipRemovedEvent(this));
+		
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {} // TODO: Ignore, Log error maybe ?
+		
+		BoardTile deathPosition = position;
+		game.getBoard().removeShip(this);
+		game.updateInterfaces(new ShipRemovedEvent(this, deathPosition));
 	}
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName()+(position!=null?"["+position.getX()+","+position.getY()+"]":"");
+		return this.getClass().getSimpleName()+(position!=null && alive?"["+position.getX()+","+position.getY()+"]":"")+(!alive?"[DEAD]":"");
 	}
 	
 	protected GameWrapper getGame() {

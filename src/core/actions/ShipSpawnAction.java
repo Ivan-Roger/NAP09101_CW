@@ -46,7 +46,7 @@ public class ShipSpawnAction extends Action {
 
 	@Override
 	public GameEvent getUndoEvent() {
-		return new ShipRemovedEvent(ship);
+		return new ShipRemovedEvent(ship, pos);
 	}
 
 }

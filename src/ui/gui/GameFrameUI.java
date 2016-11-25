@@ -83,19 +83,22 @@ public class GameFrameUI extends JFrame {
 	public void update(GameEvent event) {
 		GameEventType type = event.getType();
 		if (
-			type == GameEventType.GAME_START ||
-			type == GameEventType.NEW_TURN ||
-			type == GameEventType.SHIP_SPAWN ||
-			type == GameEventType.FIGHT ||
-			type == GameEventType.SHIP_DESTROYED ||
-			type == GameEventType.TURN_OVER
+			type == GameEventType.GAME_START		||
+			type == GameEventType.NEW_TURN			||
+			type == GameEventType.SHIP_SPAWN		||
+			type == GameEventType.FIGHT_START		||
+			type == GameEventType.FIGHT_END			||
+			type == GameEventType.TURN_OVER			||
+			type == GameEventType.GAME_OVER
 		) {
 			controlsUi.update(event);
 		}
 
 		if (
-			type == GameEventType.SHIP_SPAWN ||
-			type == GameEventType.SHIP_MOVE ||
+			type == GameEventType.SHIP_SPAWN		||
+			type == GameEventType.SHIP_MOVE			||
+			type == GameEventType.SHIP_DESTROYED	||
+			type == GameEventType.FIGHT_END			||
 			type == GameEventType.SHIP_REMOVED
 		) {
 			boardUi.update(event);
