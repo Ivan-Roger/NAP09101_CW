@@ -41,7 +41,7 @@ public class BoardUI extends JPanel {
 		this.setLayout(new BorderLayout());
 
 		JPanel xAxis = new JPanel();
-		xAxis.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 0));
+		xAxis.setBorder(BorderFactory.createEmptyBorder(0, 18, 0, 0));
 		xAxis.setLayout(new GridLayout(1, board.getWidth()));
 		for (int i=0; i<board.getWidth(); i++) {
 			xAxis.add(new JLabel(""+i, JLabel.CENTER));
@@ -49,7 +49,7 @@ public class BoardUI extends JPanel {
 		this.add(xAxis, BorderLayout.NORTH);
 		
 		JPanel yAxis = new JPanel();
-		yAxis.setPreferredSize(new Dimension(15,15));
+		yAxis.setPreferredSize(new Dimension(18,18));
 		yAxis.setLayout(new GridLayout(board.getHeight(), 1));
 		for (int i=0; i<board.getHeight(); i++) {
 			yAxis.add(new JLabel(""+i, JLabel.CENTER));

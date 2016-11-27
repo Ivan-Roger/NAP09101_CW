@@ -50,7 +50,7 @@ public class GameWorker extends Thread {
 			}
 			
 			Random alea = new Random();
-			if (alea.nextInt(3)!=0) {
+			if (alea.nextInt(game.getDifficulty())==0) {
 				Ship ship;
 				switch (alea.nextInt(3)) {
 				case 0: ship = new StarFighterShip(game); break;

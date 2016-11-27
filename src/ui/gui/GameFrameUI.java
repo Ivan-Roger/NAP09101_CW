@@ -19,9 +19,9 @@ public class GameFrameUI extends JFrame {
 	private BoardUI boardUi;
 	private ControlsUI controlsUi;
 
-	public GameFrameUI(GameWrapper game) {
+	public GameFrameUI(GameWrapper game, GraphicUI ui) {
 		super("Sky Wars - Game");
-		this.setSize(1000, 700);
+		this.setSize(300+game.getBoard().getWidth()*175, game.getBoard().getHeight()*150);
 		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		this.setLocationRelativeTo(null);
 		this.setResizable(false);
@@ -33,13 +33,14 @@ public class GameFrameUI extends JFrame {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				if (gameOver) {
-					System.exit(0);
-					// TODO: Return to menu
+				if (!gameOver) {
+					int result = JOptionPane.showConfirmDialog(null,
+						"Are you sure you want to return to menu ?\nYou won't be able to undo this.",
+						"Confirm quit", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE
+					);
+					if (result!=JOptionPane.YES_OPTION) return;
 				}
-				
-				int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to quit ?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-				if (result==JOptionPane.YES_OPTION) System.exit(0);
+				game.stopGame();
 			}
 
 			@Override
@@ -58,10 +59,10 @@ public class GameFrameUI extends JFrame {
 			public void windowDeactivated(WindowEvent e) {}
 		});
 		
-		initContent(game);
+		initContent(game, ui);
 	}
 	
-	private void initContent(GameWrapper game) {
+	private void initContent(GameWrapper game, GraphicUI ui) {
 		JPanel body = new JPanel();
 		body.setLayout(new BorderLayout());
 		
@@ -69,7 +70,7 @@ public class GameFrameUI extends JFrame {
 		boardUi = new BoardUI(board);
 		body.add(boardUi, BorderLayout.CENTER);
 		
-		controlsUi = new ControlsUI(game);
+		controlsUi = new ControlsUI(game, ui);
 		body.add(controlsUi, BorderLayout.EAST);
 		
 		this.add(body);

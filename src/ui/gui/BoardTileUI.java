@@ -34,7 +34,11 @@ public class BoardTileUI extends JPanel {
 		this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
 		this.setLayout(new BorderLayout());
 		
-		//this.add(new JLabel(tile.getX()+", "+tile.getY(), JLabel.CENTER), BorderLayout.NORTH);
+		if (tile.getType()==BoardTileType.BLACKHOLE) {
+			JLabel typeLbl = new JLabel("Black hole", JLabel.CENTER);
+			typeLbl.setForeground(Color.LIGHT_GRAY);
+			this.add(typeLbl, BorderLayout.SOUTH);
+		}
 		
 		JPanel shipsPanel = new JPanel();
 		shipsPanel.setLayout(new GridLayout(1,2));

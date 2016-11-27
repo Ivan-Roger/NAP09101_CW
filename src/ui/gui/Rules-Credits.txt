@@ -1,0 +1,18 @@
+                                                By Ivan ROGER
+                                               -----------------------
+
+This game is simple. It's aim is to stay alive as long as you can. You are playing as a spaceship called the Mother Ship.
+
+You will have to fight against three kinds of enemies coming out of the black hole: SpaceShooter, SpaceCruiser and SpaceFighter. They only differ by their appearance.
+
+You are going to move through the space grid to fight and run away from your enemies. To do so you only have to hit the play button. The Mother Ship will move randomly.
+
+If you enter in the same cell than an enemy you will have to fight against him.
+The outcome of this fight depends on the Mother Ship operational mode.
+You can switch between the offensive mode and the defensive mode.
+
+By default the attack mode is enabled. This means that you can destroy up to three other enemies. If there are more you will die.
+
+In the defense mode you can defend against one or two enemies. More and you die.
+
+GOOD LUCK, And have fun.

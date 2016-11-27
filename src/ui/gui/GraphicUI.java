@@ -8,12 +8,17 @@ import core.events.GameStartEvent;
 import ui.UiWrapper;
 
 public class GraphicUI extends UiWrapper {
-	//private MenuFrameUI menuF;
 	private GameFrameUI gameF;
+	private MenuFrameUI menuF;
 
 	public GraphicUI(GameWrapper game) {
 		super(game);
-		gameF = new GameFrameUI(game);
+		gameF = new GameFrameUI(game, this);
+	}
+	
+	public GraphicUI(GameWrapper game, MenuFrameUI menu) {
+		this(game);
+		setMenu(menu);
 	}
 
 	@Override
@@ -47,6 +52,25 @@ public class GraphicUI extends UiWrapper {
 			GameOverEvent event = (GameOverEvent) evt;
 			boolean won = event.isPlayerWinner();
 			gameF.end(won);
+		}
+		
+		if (
+			type == GameEventType.GAME_QUIT
+		) {
+			menuF.setVisible(true);
+			gameF.setVisible(false);
 		}		
+	}
+
+	public void setMenu(MenuFrameUI menu) {
+		this.menuF = menu;
+	}
+
+	public MenuFrameUI getMenu() {
+		return this.menuF;
+	}
+
+	public RulesFrameUI getRules() {
+		return this.menuF.getRules();
 	}
 }

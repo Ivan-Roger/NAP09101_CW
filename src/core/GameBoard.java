@@ -24,7 +24,7 @@ public class GameBoard {
 	}
 	
 	private ArrayList<BoardTile> buildBoard(int width, int height) throws InvalidArgumentEx {
-		if (height<1 || width<1) throw new InvalidArgumentEx("Invalid board size");
+		if (height<4 || width<4 || height>10 || width>10) throw new InvalidArgumentEx("Invalid board size, min 4x4, max 10x10");
 		ArrayList<BoardTile> res = new ArrayList<>();
 		
 		res.add(new BoardTile(this,0,BoardTileType.BLACKHOLE));

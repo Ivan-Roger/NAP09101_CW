@@ -10,5 +10,6 @@ public enum GameEventType {
 	SHIP_MOVE,
 	SHIP_DESTROYED,
 	SHIP_REMOVED,
-	GAME_OVER;
+	GAME_OVER,
+	GAME_QUIT;
 }

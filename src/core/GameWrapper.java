@@ -8,6 +8,7 @@ import ui.UiWrapper;
 import core.actions.Action;
 import core.events.GameEvent;
 import core.events.GameOverEvent;
+import core.events.GameQuitEvent;
 import core.events.GameStartEvent;
 import core.events.ShipSpawnEvent;
 import core.exceptions.GameEx;
@@ -24,12 +25,14 @@ public class GameWrapper {
 	// --- CONSTANTS ---
 	public static final int DEFAULT_BOARD_WIDTH = 4;
 	public static final int DEFAULT_BOARD_HEIGHT = 4;
+	public static final int DEFAULT_DIFFICULTY = 3;
 	public static final ShipBehaviourEnum  DEFAULT_MOTHERSHIP_BEHAVIOUR = ShipBehaviourEnum.ATTACK_MODE;
 	
 	// --- VARIABLES ---
 	private ArrayList<UiWrapper> interfaces = new ArrayList<>();
 	private GameWorker myWorker;
 	
+	private int difficulty;
 	private GameBoard board;
 	private MotherShip motherShip;
 	private int turn; 
@@ -43,7 +46,12 @@ public class GameWrapper {
 	}
 	
 	public GameWrapper(int width, int height) throws InvalidArgumentEx {
+		this(width, height, DEFAULT_DIFFICULTY);
+	}
+	
+	public GameWrapper(int width, int height, int difficulty) throws InvalidArgumentEx {
 		setBoard(new GameBoard(this, width, height));
+		this.difficulty = difficulty;
 		
 		motherShip = MotherShipFactory.create(this, DEFAULT_MOTHERSHIP_BEHAVIOUR);
 		myWorker = new GameWorker(this);
@@ -76,6 +84,10 @@ public class GameWrapper {
 	
 	public void nextTurn() {
 		turn++;
+	}
+	
+	public int getDifficulty() {
+		return difficulty;
 	}
 
 	// --- PUBLIC METHODS ---
@@ -116,6 +128,20 @@ public class GameWrapper {
 			myWorker.notify();
 		}
 	}
+	
+	public void performActions() {
+		while (!actTodo.isEmpty()) {
+			Action act = actTodo.pollFirst();
+			try {
+				act.doAction(this);
+				actDone.addFirst(act);
+				updateInterfaces(act.getDoEvent());
+			} catch (GameEx e) {
+				// TODO: Handle error:
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public void updateInterfaces(GameEvent event) {
 		for (UiWrapper ui : interfaces) {
@@ -125,9 +151,16 @@ public class GameWrapper {
 
 	public void end(boolean win) {
 		System.out.println("\n---------------------------------------------------------------------------\n"
-				+ "\t\t YOU "+(win?"WON":"LOST")+" !");
+				+ "\t\t YOU "+(win?"WON":"LOST")+" THE GAME !");
 		gameOver=true;
 		updateInterfaces(new GameOverEvent(win));
+	}
+
+	public void stopGame() {
+		System.out.println("\t\t Player left the game."
+				+ "\n---------------------------------------------------------------------------");
+		gameOver=true;
+		updateInterfaces(new GameQuitEvent());
 	}
 
 	// --- PRIVATE METHODS ---
@@ -154,19 +187,5 @@ public class GameWrapper {
 			}
 		}
 		updateInterfaces(new ShipSpawnEvent(motherShip));
-	}
-	
-	public void performActions() {
-		while (!actTodo.isEmpty()) {
-			Action act = actTodo.pollFirst();
-			try {
-				act.doAction(this);
-				actDone.addFirst(act);
-				updateInterfaces(act.getDoEvent());
-			} catch (GameEx e) {
-				// TODO: Handle error:
-				e.printStackTrace();
-			}
-		}
 	}
 }

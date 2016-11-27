@@ -22,6 +22,7 @@ import core.events.FightStartEvent;
 import core.events.GameEvent;
 import core.events.GameEventType;
 import core.events.GameOverEvent;
+import core.events.GameQuitEvent;
 import core.events.NewTurnEvent;
 import core.events.ShipSpawnEvent;
 import core.ships.EnemyShip;
@@ -32,6 +33,7 @@ import core.ships.mothership.ShipBehaviourEnum;
 @SuppressWarnings("serial")
 public class ControlsUI extends JPanel {
 	private GameWrapper game;
+	private GraphicUI ui;
 	
 	private JLabel turnLbl;
 	private JLabel statEnemiesAlive;
@@ -41,9 +43,11 @@ public class ControlsUI extends JPanel {
 	private JButton playBtn;
 	private JButton modeAttack;
 	private JButton modeDefend;
+	private ActionListener playListener;
 
-	public ControlsUI(GameWrapper game) {
+	public ControlsUI(GameWrapper game, GraphicUI ui) {
 		this.game = game;
+		this.ui = ui;
 		initContent();
 	}
 
@@ -97,6 +101,19 @@ public class ControlsUI extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.anchor = GridBagConstraints.CENTER;
+		
+		JButton rulesBtn = new JButton("Rules");
+		rulesBtn.addActionListener(new ActionListener() { // TODO: Clean Listener
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ui.getRules().display();
+			}
+		});
+		gbc.gridy = 0;
+		gbc.gridx = 0;
+		gbc.gridwidth = 2;
+		gbc.weightx = 0.0;
+		buttonsPanel.add(rulesBtn, gbc);
 
 		modeAttack = new JButton("Attack mode");
 		modeAttack.setEnabled(false);
@@ -109,7 +126,7 @@ public class ControlsUI extends JPanel {
 				gameLog.append("\nSwitching mode to ATTACK.");
 			}
 		});
-		gbc.gridy = 0;
+		gbc.gridy++;
 		gbc.gridx = 0;
 		gbc.gridwidth = 1;
 		gbc.weightx = 0.5;
@@ -128,17 +145,11 @@ public class ControlsUI extends JPanel {
 		});
 		gbc.gridx++;
 		buttonsPanel.add(modeDefend, gbc);
-		
+
 		playBtn = new JButton("PLAY");
 		playBtn.setEnabled(false);
 		playBtn.setPreferredSize(new Dimension(300, 50));
-		playBtn.addActionListener(new ActionListener() { // TODO: Clean Listener
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				playBtn.setEnabled(false);
-				game.play();
-			}
-		});
+		playBtn.addActionListener(getPlayListener());
 		gbc.gridy++;
 		gbc.gridx = 0;
 		gbc.gridwidth = 2;
@@ -161,7 +172,7 @@ public class ControlsUI extends JPanel {
 			gameLog.setText("--- TURN "+event.getTurnNumber()+" ---");
 			
 		} else if (type == GameEventType.TURN_OVER) {
-			playBtn.setEnabled(!game.isOver());
+			playBtn.setEnabled(true);
 			
 		} else if (type == GameEventType.SHIP_SPAWN) {
 			ShipSpawnEvent event = (ShipSpawnEvent) evt;
@@ -184,8 +195,27 @@ public class ControlsUI extends JPanel {
 		} else if (type == GameEventType.GAME_OVER) {
 			GameOverEvent event = (GameOverEvent) evt;
 			statPlayerWon.setText("YOU "+(event.isPlayerWinner()?"WON":"LOST")+" !");
+			playBtn.removeActionListener(playListener);
 			modeAttack.setEnabled(false);
 			modeDefend.setEnabled(false);
+			playBtn.setText("QUIT");
+			playBtn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					game.stopGame();
+				}
+			});
 		}
+	}
+	
+	private ActionListener getPlayListener() {
+		playListener = new ActionListener() { // TODO: Clean Listener
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				playBtn.setEnabled(false);
+				game.play();
+			}
+		};
+		return playListener;
 	}
 }
