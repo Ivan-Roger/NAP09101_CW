@@ -72,7 +72,7 @@ public abstract class Ship {
 		
 		try {
 			Thread.sleep(500);
-		} catch (InterruptedException e) {} // TODO: Ignore, Log error maybe ?
+		} catch (InterruptedException e) {} // Ignore error
 		
 		BoardTile deathPosition = position;
 		game.getBoard().removeShip(this);

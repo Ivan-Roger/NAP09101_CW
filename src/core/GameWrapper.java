@@ -6,6 +6,7 @@ import java.util.Random;
 
 import ui.UiWrapper;
 import core.actions.Action;
+import core.events.ExceptionEvent;
 import core.events.GameEvent;
 import core.events.GameOverEvent;
 import core.events.GameQuitEvent;
@@ -42,7 +43,7 @@ public class GameWrapper {
 	
 	// --- CONSTRUCTORS ---
 	public GameWrapper() throws InvalidArgumentEx {
-		this(DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT);
+		this(DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT, DEFAULT_DIFFICULTY);
 	}
 	
 	public GameWrapper(int width, int height) throws InvalidArgumentEx {
@@ -121,8 +122,8 @@ public class GameWrapper {
 	}
 	
 	public void play() {
-		if (gameOver) return; // TODO: Throw an exception
-		if (!myWorker.isAlive()) return; // TODO: Throw an exception
+		if (gameOver) return;
+		if (!myWorker.isAlive()) return;
 		System.out.println("WRAPPER| Notify thread ...");
 		synchronized (myWorker) {
 			myWorker.notify();
@@ -136,9 +137,10 @@ public class GameWrapper {
 				act.doAction(this);
 				actDone.addFirst(act);
 				updateInterfaces(act.getDoEvent());
-			} catch (GameEx e) {
-				// TODO: Handle error:
-				e.printStackTrace();
+			} catch (Exception ex) {
+				System.out.println("EXCEPT | "+ex.getClass().getSimpleName()+": "+ex.getMessage());
+				ex.printStackTrace();
+				updateInterfaces(new ExceptionEvent(ex, false));
 			}
 		}
 	}

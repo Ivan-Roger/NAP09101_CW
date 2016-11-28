@@ -3,6 +3,7 @@ package core;
 import java.util.Random;
 
 import core.actions.ShipSpawnAction;
+import core.events.ExceptionEvent;
 import core.events.NewTurnEvent;
 import core.events.TurnOverEvent;
 import core.exceptions.InvalidArgumentEx;
@@ -24,6 +25,7 @@ public class GameWorker extends Thread {
 	@Override
 	public void run() {
 		System.out.println("THREAD | Started !");
+		game.updateInterfaces(new TurnOverEvent(game.getTurn()));
 		while (!game.isOver()) {
 			System.out.println("THREAD | Waiting ...");
 			
@@ -44,9 +46,12 @@ public class GameWorker extends Thread {
 					s.move();
 				}
 				game.getMotherShip().move();
-			} catch (NotInitializedEx e) {
-				// TODO Unexpected: Ship not spawned
-				System.err.println("Ship was not spawned !");
+			} catch (NotInitializedEx ex) {
+				// Unexpected, Ship not spawned
+				System.out.println("EXCEPT | "+ex.getClass().getSimpleName()+": "+ex.getMessage());
+				ex.printStackTrace();
+				game.updateInterfaces(new ExceptionEvent(ex, true));
+				System.exit(-4);
 			}
 			
 			Random alea = new Random();
@@ -59,12 +64,18 @@ public class GameWorker extends Thread {
 				}
 				try {
 					game.addAction(new ShipSpawnAction(ship, game.getBoard().getTile(0, 0)));
-				} catch (InvalidArgumentEx e) {
-					// TODO Exception, Impossible: Ship already spawned
-					e.printStackTrace();
-				} catch (OutOfBoundsEx e) {
-					// TODO Exception: Invalid board. No tile at 0,0
-					e.printStackTrace();
+				} catch (InvalidArgumentEx ex) {
+					// Impossible: Ship already spawned
+					System.out.println("EXCEPT | "+ex.getClass().getSimpleName()+": "+ex.getMessage());
+					ex.printStackTrace();
+					game.updateInterfaces(new ExceptionEvent(ex, true));
+					System.exit(-4);
+				} catch (OutOfBoundsEx ex) {
+					// Invalid board. No tile at 0,0
+					System.out.println("EXCEPT | "+ex.getClass().getSimpleName()+": "+ex.getMessage());
+					ex.printStackTrace();
+					game.updateInterfaces(new ExceptionEvent(ex, true));
+					System.exit(-4);
 				}
 			}
 	

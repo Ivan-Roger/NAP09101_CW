@@ -2,6 +2,7 @@ package core;
 
 import java.util.ArrayList;
 
+import core.events.ExceptionEvent;
 import core.exceptions.InvalidArgumentEx;
 import core.exceptions.NotInitializedEx;
 import core.exceptions.OutOfBoundsEx;
@@ -105,9 +106,12 @@ public class GameBoard {
 		
 		try {
 			ship.getPosition().removeShip(ship);
-		} catch (InvalidArgumentEx e) {
-			// TODO Exception, Impossible: Invalid type of ship
-			e.printStackTrace();
+		} catch (InvalidArgumentEx ex) {
+			// Invalid type of ship
+			System.out.println("EXCEPT | "+ex.getClass().getSimpleName()+": "+ex.getMessage());
+			ex.printStackTrace();
+			game.updateInterfaces(new ExceptionEvent(ex, true));
+			System.exit(-5);
 		}
 		ship.setPosition(null);
 	}

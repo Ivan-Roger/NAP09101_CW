@@ -1,6 +1,7 @@
 package core.events;
 
 public enum GameEventType {
+	EXCEPTION,
 	GAME_START,
 	NEW_TURN,
 	TURN_OVER,

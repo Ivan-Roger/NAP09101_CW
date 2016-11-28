@@ -65,7 +65,7 @@ public class BoardUI extends JPanel {
 				grid.add(tile);
 			}
 		} catch (OutOfBoundsEx e) {
-			// TODO Exception, Board malformed. throw InitError
+			// TODO UI - Exception, Board malformed. throw InitError
 			e.printStackTrace();
 		}
 		this.add(grid, BorderLayout.CENTER);
@@ -100,7 +100,7 @@ public class BoardUI extends JPanel {
 				res = new ImageIcon(img);
 				shipIcons.put(ship, res);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				// TODO UI - Exception, Unable to load shipIcon
 				e.printStackTrace();
 			}
 		}
@@ -113,7 +113,7 @@ public class BoardUI extends JPanel {
 				BufferedImage img = ImageIO.read(BoardUI.class.getResourceAsStream("assets/BlownShip.png"));
 				blownShipIcon = new ImageIcon(img);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				// TODO UI - Exception, Unable to load blowIcon
 				e.printStackTrace();
 			}
 		}

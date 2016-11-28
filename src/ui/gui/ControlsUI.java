@@ -22,7 +22,6 @@ import core.events.FightStartEvent;
 import core.events.GameEvent;
 import core.events.GameEventType;
 import core.events.GameOverEvent;
-import core.events.GameQuitEvent;
 import core.events.NewTurnEvent;
 import core.events.ShipSpawnEvent;
 import core.ships.EnemyShip;

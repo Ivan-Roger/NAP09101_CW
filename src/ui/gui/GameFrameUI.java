@@ -26,7 +26,7 @@ public class GameFrameUI extends JFrame {
 		this.setLocationRelativeTo(null);
 		this.setResizable(false);
 		
-		// TODO: Clean this listener
+		// TODO: Clean Listener
 		this.addWindowListener(new WindowListener() {
 			@Override
 			public void windowOpened(WindowEvent e) {}

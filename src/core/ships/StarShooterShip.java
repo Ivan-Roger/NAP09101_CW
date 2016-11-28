@@ -1,7 +1,6 @@
 package core.ships;
 
 import core.GameWrapper;
-import core.exceptions.NotInitializedEx;
 
 public class StarShooterShip extends EnemyShip {
 

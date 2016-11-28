@@ -1,6 +1,9 @@
 package ui.gui;
 
+import javax.swing.JOptionPane;
+
 import core.GameWrapper;
+import core.events.ExceptionEvent;
 import core.events.GameEvent;
 import core.events.GameEventType;
 import core.events.GameOverEvent;
@@ -59,6 +62,15 @@ public class GraphicUI extends UiWrapper {
 		) {
 			menuF.setVisible(true);
 			gameF.setVisible(false);
+		}
+		
+		if (
+			type == GameEventType.EXCEPTION
+		) {
+			ExceptionEvent event = (ExceptionEvent) evt;
+			Exception ex = event.getException();
+			getGame().stopGame();
+			JOptionPane.showMessageDialog(null, (event.isCritic()?"FATAL - ":"")+"Unexpected error:\n\n"+ex.getClass().getName()+": "+ex.getMessage(), (event.isCritic()?"FATAL ERROR":"Error"), (event.isCritic()?JOptionPane.ERROR_MESSAGE:JOptionPane.WARNING_MESSAGE));
 		}		
 	}
 
