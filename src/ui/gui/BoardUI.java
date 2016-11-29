@@ -27,12 +27,14 @@ import core.exceptions.OutOfBoundsEx;
 
 @SuppressWarnings("serial")
 public class BoardUI extends JPanel {
+	private GraphicUI ui;
 	private ArrayList<BoardTileUI> tiles;
 	
 	private static HashMap<String,ImageIcon> shipIcons = new HashMap<>();
 	private static ImageIcon blownShipIcon;
 
-	public BoardUI(GameBoard board) {
+	public BoardUI(GameBoard board, GraphicUI ui) {
+		this.ui = ui;
 		tiles = new ArrayList<>();
 		initContent(board);
 	}
@@ -60,13 +62,13 @@ public class BoardUI extends JPanel {
 		grid.setLayout(new GridLayout(board.getHeight(), board.getWidth()));
 		try {
 			for (int i=0; i<board.getSize(); i++) {
-				BoardTileUI tile = new BoardTileUI(board.getTile(i));
+				BoardTileUI tile = new BoardTileUI(board.getTile(i), ui);
 				tiles.add(tile);
 				grid.add(tile);
 			}
-		} catch (OutOfBoundsEx e) {
-			// TODO UI - Exception, Board malformed. throw InitError
-			e.printStackTrace();
+		} catch (OutOfBoundsEx ex) {
+			// Board malformed. (throw InitError ?)
+			ui.displayException(ex, true);
 		}
 		this.add(grid, BorderLayout.CENTER);
 	}
@@ -91,7 +93,7 @@ public class BoardUI extends JPanel {
 		}
 	}
 	
-	public static ImageIcon getShipIcon(String ship) {
+	public static ImageIcon getShipIcon(String ship) throws IOException {
 		ImageIcon res = shipIcons.get(ship);
 		if (res==null) {
 			BufferedImage img;
@@ -99,22 +101,22 @@ public class BoardUI extends JPanel {
 				img = ImageIO.read(BoardUI.class.getResourceAsStream("assets/"+ship+".png"));
 				res = new ImageIcon(img);
 				shipIcons.put(ship, res);
-			} catch (IOException e) {
-				// TODO UI - Exception, Unable to load shipIcon
-				e.printStackTrace();
+			} catch (IOException ex) {
+				// Unable to load shipIcon
+				throw ex;
 			}
 		}
 		return res;
 	}
 
-	public static Icon getBlownShipIcon() {
+	public static Icon getBlownShipIcon() throws IOException {
 		if (blownShipIcon==null) {
 			try {
 				BufferedImage img = ImageIO.read(BoardUI.class.getResourceAsStream("assets/BlownShip.png"));
 				blownShipIcon = new ImageIcon(img);
-			} catch (IOException e) {
-				// TODO UI - Exception, Unable to load blowIcon
-				e.printStackTrace();
+			} catch (IOException ex) {
+				// Unable to load blowIcon
+				throw ex;
 			}
 		}
 		return blownShipIcon;

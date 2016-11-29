@@ -37,6 +37,7 @@ public class GameWorker extends Thread {
 				}
 			}
 
+			game.clearActions();
 			game.nextTurn();
 			game.updateInterfaces(new NewTurnEvent(game.getTurn()));
 			System.out.println(" TICK  | --- New turn ---");

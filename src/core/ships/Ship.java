@@ -68,6 +68,7 @@ public abstract class Ship {
 	
 	public void destroy() {
 		alive = false;
+		game.getBoard().destroyShip(this);
 		game.updateInterfaces(new ShipDestroyedEvent(this));
 		
 		try {

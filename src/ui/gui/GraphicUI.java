@@ -68,9 +68,7 @@ public class GraphicUI extends UiWrapper {
 			type == GameEventType.EXCEPTION
 		) {
 			ExceptionEvent event = (ExceptionEvent) evt;
-			Exception ex = event.getException();
-			getGame().stopGame();
-			JOptionPane.showMessageDialog(null, (event.isCritic()?"FATAL - ":"")+"Unexpected error:\n\n"+ex.getClass().getName()+": "+ex.getMessage(), (event.isCritic()?"FATAL ERROR":"Error"), (event.isCritic()?JOptionPane.ERROR_MESSAGE:JOptionPane.WARNING_MESSAGE));
+			displayException(event.getException(),event.isCritic());
 		}		
 	}
 
@@ -84,5 +82,10 @@ public class GraphicUI extends UiWrapper {
 
 	public RulesFrameUI getRules() {
 		return this.menuF.getRules();
+	}
+	
+	public void displayException(Exception ex, boolean critic) {
+		JOptionPane.showMessageDialog(null, (critic?"FATAL - ":"")+"Unexpected error:\n\n"+ex.getClass().getName()+": "+ex.getMessage(), (critic?"FATAL ERROR":"Error"), (critic?JOptionPane.ERROR_MESSAGE:JOptionPane.WARNING_MESSAGE));
+		if (critic) getGame().stopGame();
 	}
 }

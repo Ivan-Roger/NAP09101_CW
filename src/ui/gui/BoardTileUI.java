@@ -3,6 +3,7 @@ package ui.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.io.IOException;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
@@ -17,10 +18,12 @@ import core.ships.mothership.MotherShip;
 
 @SuppressWarnings("serial")
 public class BoardTileUI extends JPanel {
+	private GraphicUI ui;
 	private HashMap<String, JLabel> shipList;
 	private HashMap<String, JLabel> shipCountList;
 
-	public BoardTileUI(BoardTile tile) {
+	public BoardTileUI(BoardTile tile, GraphicUI ui) {
+		this.ui = ui;
 		shipList = new HashMap<>();
 		shipCountList = new HashMap<>();
 		initContent(tile);
@@ -45,7 +48,11 @@ public class BoardTileUI extends JPanel {
 		shipsPanel.setBackground(backColor);
 		
 		JLabel motherShip = new JLabel("", JLabel.CENTER);
-		motherShip.setIcon(BoardUI.getShipIcon(MotherShip.class.getSimpleName()));
+		try {
+			motherShip.setIcon(BoardUI.getShipIcon(MotherShip.class.getSimpleName()));
+		} catch (IOException ex) {
+			ui.displayException(ex, true);
+		}
 		motherShip.setVisible(false);
 		shipList.put(MotherShip.class.getSimpleName(), motherShip);
 		shipsPanel.add(motherShip);
@@ -55,7 +62,11 @@ public class BoardTileUI extends JPanel {
 		enemyShipsPanel.setLayout(new GridLayout(3,2));
 		for (EnemyShipType type : EnemyShipType.values()) {
 			JLabel ship = new JLabel("", JLabel.CENTER);
-			ship.setIcon(BoardUI.getShipIcon(type.getClassName()));
+			try {
+				ship.setIcon(BoardUI.getShipIcon(type.getClassName()));
+			} catch (IOException ex) {
+				ui.displayException(ex, true);
+			}
 			ship.setVisible(false);
 			shipList.put(type.getClassName(), ship);
 			enemyShipsPanel.add(ship);
@@ -82,12 +93,20 @@ public class BoardTileUI extends JPanel {
 	}
 	
 	public void destroyShip(Ship ship) {
-		shipList.get(ship.getClass().getSimpleName()).setIcon(BoardUI.getBlownShipIcon());
+		try {
+			shipList.get(ship.getClass().getSimpleName()).setIcon(BoardUI.getBlownShipIcon());
+		} catch (IOException ex) {
+			ui.displayException(ex, true);
+		}
 	}
 	
 	public void resetTile(BoardTile tile) {
 		for (EnemyShipType type : EnemyShipType.values()) {
-			shipList.get(type.getClassName()).setIcon(BoardUI.getShipIcon(type.getClassName()));
+			try {
+				shipList.get(type.getClassName()).setIcon(BoardUI.getShipIcon(type.getClassName()));
+			} catch (IOException ex) {
+				ui.displayException(ex, true);
+			}
 		}
 	}
 	

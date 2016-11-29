@@ -96,13 +96,18 @@ public class GameBoard {
 		pos.addShip(ship);
 	}
 
-	public void removeShip(Ship ship) {
+	public void destroyShip(Ship ship) {
 		if (ship instanceof EnemyShip) {
-			ships.remove((EnemyShip) ship);
 			killCount++;
 		}
 		
-		if (ships.size()==0) game.end(true);
+		if (ships.size()-1==0) game.end(true);
+	}
+
+	public void removeShip(Ship ship) {
+		if (ship instanceof EnemyShip) {
+			ships.remove((EnemyShip) ship);
+		}
 		
 		try {
 			ship.getPosition().removeShip(ship);

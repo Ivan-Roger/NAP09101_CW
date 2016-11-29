@@ -107,14 +107,18 @@ public class GameWrapper {
 	}
 	
 	public void undo() throws InvalidActionEx {
-		Action act = actDone.pollFirst();
-		if (act==null) return;
-		try {
-			act.undoAction(this);
-			updateInterfaces(act.getUndoEvent());
-		} catch (GameEx e) {
-			throw new InvalidActionEx(e);
+		while (! actDone.isEmpty()) {
+			Action act = actDone.pollFirst();
+			try {
+				act.undoAction(this);
+				updateInterfaces(act.getUndoEvent());
+			} catch (GameEx ex) {
+				System.out.println("EXCEPT | "+ex.getClass().getSimpleName()+": "+ex.getMessage());
+				ex.printStackTrace();
+				updateInterfaces(new ExceptionEvent(ex, false));
+			}
 		}
+		turn--;
 	}
 	
 	public boolean canUndo() {
@@ -143,6 +147,10 @@ public class GameWrapper {
 				updateInterfaces(new ExceptionEvent(ex, false));
 			}
 		}
+	}
+
+	public void clearActions() {
+		actDone.clear();
 	}
 
 	public void updateInterfaces(GameEvent event) {

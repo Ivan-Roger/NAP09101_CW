@@ -67,7 +67,7 @@ public class GameFrameUI extends JFrame {
 		body.setLayout(new BorderLayout());
 		
 		GameBoard board = game.getBoard();
-		boardUi = new BoardUI(board);
+		boardUi = new BoardUI(board, ui);
 		body.add(boardUi, BorderLayout.CENTER);
 		
 		controlsUi = new ControlsUI(game, ui);

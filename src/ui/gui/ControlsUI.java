@@ -24,6 +24,7 @@ import core.events.GameEventType;
 import core.events.GameOverEvent;
 import core.events.NewTurnEvent;
 import core.events.ShipSpawnEvent;
+import core.exceptions.InvalidActionEx;
 import core.ships.EnemyShip;
 import core.ships.mothership.ShipBehaviourAttack;
 import core.ships.mothership.ShipBehaviourDefend;
@@ -39,6 +40,7 @@ public class ControlsUI extends JPanel {
 	private JLabel statEnemiesKilled;
 	private JLabel statPlayerWon;
 	private JTextArea gameLog;
+	private JButton undoBtn;
 	private JButton playBtn;
 	private JButton modeAttack;
 	private JButton modeDefend;
@@ -114,13 +116,18 @@ public class ControlsUI extends JPanel {
 		gbc.weightx = 0.0;
 		buttonsPanel.add(rulesBtn, gbc);
 		
-		JButton undoBtn = new JButton("UNDO");
+		undoBtn = new JButton("UNDO");
 		undoBtn.addActionListener(new ActionListener() { // TODO: Clean Listener
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (game.canUndo()) {
+				try {
 					game.undo();
+				} catch (InvalidActionEx ex) {
+					ui.displayException(ex, true);
 				}
+				undoBtn.setEnabled(game.canUndo());
+				statEnemiesAlive.setText("Enemies alive: "+game.getBoard().getEnemyShips().size());
+				statEnemiesKilled.setText("Enemies killed: "+game.getBoard().getKillCount());
 			}
 		});
 		gbc.gridy++;
@@ -184,9 +191,11 @@ public class ControlsUI extends JPanel {
 			NewTurnEvent event = (NewTurnEvent) evt;
 			turnLbl.setText("Turn "+event.getTurnNumber());
 			gameLog.setText("--- TURN "+event.getTurnNumber()+" ---");
+			undoBtn.setEnabled(game.canUndo());
 			
 		} else if (type == GameEventType.TURN_OVER) {
 			playBtn.setEnabled(true);
+			undoBtn.setEnabled(game.canUndo());
 			
 		} else if (type == GameEventType.SHIP_SPAWN) {
 			ShipSpawnEvent event = (ShipSpawnEvent) evt;
