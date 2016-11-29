@@ -113,6 +113,21 @@ public class ControlsUI extends JPanel {
 		gbc.gridwidth = 2;
 		gbc.weightx = 0.0;
 		buttonsPanel.add(rulesBtn, gbc);
+		
+		JButton undoBtn = new JButton("UNDO");
+		undoBtn.addActionListener(new ActionListener() { // TODO: Clean Listener
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (game.canUndo()) {
+					game.undo();
+				}
+			}
+		});
+		gbc.gridy++;
+		gbc.gridx = 0;
+		gbc.gridwidth = 2;
+		gbc.weightx = 0.0;
+		buttonsPanel.add(undoBtn, gbc);
 
 		modeAttack = new JButton("Attack mode");
 		modeAttack.setEnabled(false);
